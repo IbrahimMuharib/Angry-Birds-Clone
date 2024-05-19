@@ -15,7 +15,6 @@ public class Pig : MonoBehaviour
 
     public void DamagePig(float damageAmount)
     {
-        Debug.Log(damageAmount);
         currentHealth -= damageAmount;
         if (currentHealth <= 0f)
         {

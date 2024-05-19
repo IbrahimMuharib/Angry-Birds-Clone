@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
     public void RemovePiggie(Pig piggie)
     {
         piggies.Remove(piggie);
+        CheckForWin();
     }
 
     private void CheckForWin()
