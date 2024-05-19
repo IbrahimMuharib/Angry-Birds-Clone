@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class SlingShotHandler : MonoBehaviour
@@ -15,6 +16,7 @@ public class SlingShotHandler : MonoBehaviour
     [Header("SlingShotConfig")]
     [SerializeField] private float maxLength = 5f;
     [SerializeField] private float shotForce = 5f;
+    [SerializeField] private float respawnTimer = 2f;
     [SerializeField] private SlingShotArea slingShotArea;
     [Header("Birb")]
     [SerializeField] private Angies birbPrefab;
@@ -24,6 +26,7 @@ public class SlingShotHandler : MonoBehaviour
     private Vector2 directionNormalized;
     private Angies birb;
     private bool clickedWithinArea = false;
+    private bool birdOnSlingShot = false;
     private void Awake()
     {
         leftLineRenderer.enabled = false;
@@ -37,19 +40,26 @@ public class SlingShotHandler : MonoBehaviour
         {
             clickedWithinArea = true;
         }
-        if (Mouse.current.leftButton.isPressed && clickedWithinArea)
+        if (Mouse.current.leftButton.isPressed && clickedWithinArea && birdOnSlingShot)
         {
             DrawSlingShot();
             positionAndRotateAngie();
         }
 
-        if (Mouse.current.leftButton.wasReleasedThisFrame)
+        if (Mouse.current.leftButton.wasReleasedThisFrame && birdOnSlingShot)
         {
-            clickedWithinArea = false;
-            birb.LaunchBird(direction, shotForce);
-            ClearSlingShot();
-            birb = null;
-            SpawnBird();
+            if (GameManager.Instance.canShoot())
+            {
+                clickedWithinArea = false;
+                birb.LaunchBird(direction, shotForce);
+                GameManager.Instance.UseShot();
+                birdOnSlingShot = false;
+                ResetSlingShot();
+                if (GameManager.Instance.canShoot())
+                {
+                    StartCoroutine(spawnAngieAfterTime());
+                }
+            }
         }
 
     }
@@ -59,13 +69,13 @@ public class SlingShotHandler : MonoBehaviour
     {
         Vector2 touchPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         linesPosition = Vector2.ClampMagnitude(touchPosition - (Vector2)centerTransform.position, maxLength) + (Vector2)centerTransform.position;
-        SetLines(linesPosition, linesPosition);
+        SetLines(linesPosition);
 
         direction = (Vector2)centerTransform.position - linesPosition;
         directionNormalized = direction.normalized;
     }
 
-    private void SetLines(Vector2 rightPosition, Vector2 leftPosition)
+    private void SetLines(Vector2 position)
     {
         if (!leftLineRenderer.enabled)
         {
@@ -76,28 +86,33 @@ public class SlingShotHandler : MonoBehaviour
             rightLineRenderer.enabled = true;
         }
 
-        rightLineRenderer.SetPosition(0, rightPosition);
+        rightLineRenderer.SetPosition(0, position);
         rightLineRenderer.SetPosition(1, rightTransform.position);
-        leftLineRenderer.SetPosition(0, leftPosition);
+        leftLineRenderer.SetPosition(0, position);
         leftLineRenderer.SetPosition(1, leftTransform.position);
 
     }
 
-    private void ClearSlingShot()
+    private void ResetSlingShot()
     {
-        SetLines(rightTransform.position, leftTransform.position);
+        SetLines(centerTransform.position);
     }
     #endregion
 
     #region birb
     private void SpawnBird()
     {
-        SetLines(idleTransform.position, idleTransform.position);
+        if (birb != null)
+        {
+            Destroy(birb.gameObject);
+        }
+        SetLines(idleTransform.position);
 
         Vector2 dir = (centerTransform.position - idleTransform.position).normalized;
         Vector2 spawnPosition = (Vector2)idleTransform.position + dir * birbPositionOffset;
         birb = Instantiate(birbPrefab, spawnPosition, Quaternion.identity);
         birb.transform.right = dir;
+        birdOnSlingShot = true;
 
     }
 
@@ -105,6 +120,12 @@ public class SlingShotHandler : MonoBehaviour
     {
         birb.transform.position = linesPosition + directionNormalized * birbPositionOffset;
         birb.transform.right = directionNormalized;
+    }
+
+    private IEnumerator spawnAngieAfterTime()
+    {
+        yield return new WaitForSeconds(respawnTimer);
+        SpawnBird();
     }
     #endregion
 }
