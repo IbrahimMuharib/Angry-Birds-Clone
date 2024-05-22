@@ -8,10 +8,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     [SerializeField] private float EndGameCheckWaitTimer = 5f;
+    [SerializeField] private GameObject restartScreen;
+    [SerializeField] private SlingShotHandler slingShotHandler;
     public int MaxNumberOfShots = 3;
     private int usedNumberOfShots = 0;
     private IconHandler iconHandler;
-    private List<Pig> piggies = new List<Pig>();
+    private List<Piggie> piggies = new List<Piggie>();
 
     private void Awake()
     {
@@ -20,7 +22,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
         }
         iconHandler = FindObjectOfType<IconHandler>();
-        Pig[] pigs = FindObjectsOfType<Pig>();
+        Piggie[] pigs = FindObjectsOfType<Piggie>();
         for (int i = 0; i < pigs.Length; i++)
         {
             piggies.Add(pigs[i]);
@@ -57,11 +59,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Lose();
+            Restart();
         }
     }
 
-    public void RemovePiggie(Pig piggie)
+    public void RemovePiggie(Piggie piggie)
     {
         piggies.Remove(piggie);
         CheckForWin();
@@ -78,10 +80,12 @@ public class GameManager : MonoBehaviour
     private void Win()
     {
         Debug.Log("WIN");
+        restartScreen.SetActive(true);
+        slingShotHandler.enabled = false;
     }
-    private void Lose()
+    public void Restart()
     {
-        Debug.Log("LOSE");
+        Debug.Log("RESTARTING");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
