@@ -44,7 +44,7 @@ public class SlingShotHandler : MonoBehaviour
             positionAndRotateAngie();
         }
 
-        if (InputManager.WasLeftMouseButtonReleased && birbOnSlingShot)
+        if (InputManager.WasLeftMouseButtonReleased && birbOnSlingShot && clickedWithinArea)
         {
             if (GameManager.Instance.canShoot())
             {
