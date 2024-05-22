@@ -34,17 +34,17 @@ public class SlingShotHandler : MonoBehaviour
 
     private void Update()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame && slingShotArea.IsWithinSlingShotArea())
+        if (InputManager.WasLeftMouseButtonPressed && slingShotArea.IsWithinSlingShotArea())
         {
             clickedWithinArea = true;
         }
-        if (Mouse.current.leftButton.isPressed && clickedWithinArea && birbOnSlingShot)
+        if (InputManager.IsLeftMouseButtonPressed && clickedWithinArea && birbOnSlingShot)
         {
             DrawSlingShot();
             positionAndRotateAngie();
         }
 
-        if (Mouse.current.leftButton.wasReleasedThisFrame && birbOnSlingShot)
+        if (InputManager.WasLeftMouseButtonReleased && birbOnSlingShot)
         {
             if (GameManager.Instance.canShoot())
             {
@@ -65,7 +65,7 @@ public class SlingShotHandler : MonoBehaviour
     #region slingshot
     private void DrawSlingShot()
     {
-        Vector2 touchPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 touchPosition = Camera.main.ScreenToWorldPoint(InputManager.MousePosition);
         linesPosition = Vector2.ClampMagnitude(touchPosition - (Vector2)centerTransform.position, maxLength) + (Vector2)centerTransform.position;
         SetLines(linesPosition);
 
