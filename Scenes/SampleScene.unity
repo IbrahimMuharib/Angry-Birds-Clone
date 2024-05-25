@@ -382,9 +382,62 @@ MonoBehaviour:
   rightTransform: {fileID: 291396053}
   centerTransform: {fileID: 1825804266}
   idleTransform: {fileID: 1101581049}
+  elasticTransform: {fileID: 1952595870}
   maxLength: 5
   shotForce: 5
   respawnTimer: 5
+  slingSpeedModifier: 1.5
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 8.335594
+      outSlope: 8.335594
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.030785125
+      value: 0.2566123
+      inSlope: 13.345615
+      outSlope: 13.345615
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.08195707
+      value: 1.1959059
+      inSlope: -2.236435
+      outSlope: -2.236435
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.049861077
+    - serializedVersion: 3
+      time: 0.22156996
+      value: 0.9351485
+      inSlope: 0.25825846
+      outSlope: 0.25825846
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.3026915
+      outWeight: 0.045996793
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.08331066
+      outSlope: 0.08331066
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   slingShotArea: {fileID: 176897109}
   birbPrefab: {fileID: 493189563280859818, guid: 72b4a7e617fcb2c499185fc7cf4e611b, type: 3}
   birbPositionOffset: 0.28
@@ -2437,7 +2490,39 @@ Transform:
   - {fileID: 291396053}
   - {fileID: 1825804266}
   - {fileID: 1101581049}
+  - {fileID: 1952595870}
   m_Father: {fileID: 181862307}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1952595869
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1952595870}
+  m_Layer: 0
+  m_Name: ElasticTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1952595870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952595869}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1944844110}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1955793965
 GameObject:

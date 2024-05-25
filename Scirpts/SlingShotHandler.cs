@@ -1,8 +1,13 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class SlingShotHandler : MonoBehaviour
 {
+    [Header("Sounds")]
+    [SerializeField] private AudioClip elasticPulledClip;
+    [SerializeField] private AudioClip[] elasticReleasedClips;
+
     [Header("LineRenderers")]
     [SerializeField] private LineRenderer leftLineRenderer;
     [SerializeField] private LineRenderer rightLineRenderer;
@@ -11,10 +16,13 @@ public class SlingShotHandler : MonoBehaviour
     [SerializeField] private Transform rightTransform;
     [SerializeField] private Transform centerTransform;
     [SerializeField] private Transform idleTransform;
+    [SerializeField] private Transform elasticTransform;
     [Header("SlingShotConfig")]
     [SerializeField] private float maxLength = 5f;
     [SerializeField] private float shotForce = 5f;
     [SerializeField] private float respawnTimer = 2f;
+    [SerializeField] private float slingSpeedModifier = 1.2f;
+    [SerializeField] private AnimationCurve animationCurve;
     [SerializeField] private SlingShotArea slingShotArea;
     [Header("Birb")]
     [SerializeField] private Birb birbPrefab;
@@ -25,8 +33,11 @@ public class SlingShotHandler : MonoBehaviour
     private Birb birb;
     private bool clickedWithinArea = false;
     private bool birbOnSlingShot = false;
+    private AudioSource audioSource;
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
+
         leftLineRenderer.enabled = false;
         rightLineRenderer.enabled = false;
         SpawnBirb();
@@ -37,6 +48,13 @@ public class SlingShotHandler : MonoBehaviour
         if (InputManager.WasLeftMouseButtonPressed && slingShotArea.IsWithinSlingShotArea())
         {
             clickedWithinArea = true;
+            if (birbOnSlingShot)
+            {
+                Debug.Log(SoundManager.Instance);
+                Debug.Log(elasticPulledClip);
+                Debug.Log(audioSource);
+                SoundManager.Instance.PlayClip(elasticPulledClip, audioSource);
+            }
         }
         if (InputManager.IsLeftMouseButtonPressed && clickedWithinArea && birbOnSlingShot)
         {
@@ -49,10 +67,11 @@ public class SlingShotHandler : MonoBehaviour
             if (GameManager.Instance.canShoot())
             {
                 clickedWithinArea = false;
-                birb.LaunchBirb(direction, shotForce);
-                GameManager.Instance.UseShot();
                 birbOnSlingShot = false;
-                ResetSlingShot();
+                birb.LaunchBirb(direction, shotForce);
+                SoundManager.Instance.PlayRandomClip(elasticReleasedClips, audioSource);
+                GameManager.Instance.UseShot();
+                AnimateSlingShot();
                 if (GameManager.Instance.canShoot())
                 {
                     StartCoroutine(spawnAngieAfterTime());
@@ -91,10 +110,6 @@ public class SlingShotHandler : MonoBehaviour
 
     }
 
-    private void ResetSlingShot()
-    {
-        SetLines(centerTransform.position);
-    }
     #endregion
 
     #region birb
@@ -124,6 +139,30 @@ public class SlingShotHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(respawnTimer);
         SpawnBirb();
+    }
+    #endregion
+
+    #region tween
+    private void AnimateSlingShot()
+    {
+        elasticTransform.position = leftLineRenderer.GetPosition(0);
+        float distance = Vector2.Distance(elasticTransform.position, centerTransform.position);
+        float time = distance / slingSpeedModifier;
+
+        elasticTransform.DOMove(centerTransform.position, time).SetEase(animationCurve);
+        StartCoroutine(AnimateSlingShotLines(elasticTransform, time));
+    }
+
+    private IEnumerator AnimateSlingShotLines(Transform trans, float time)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            SetLines(trans.position);
+            yield return null;
+        }
     }
     #endregion
 }
